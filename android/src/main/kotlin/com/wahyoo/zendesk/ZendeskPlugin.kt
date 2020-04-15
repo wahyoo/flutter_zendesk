@@ -62,7 +62,7 @@ public class ZendeskPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
         when (call.method) {
             "initialize" -> initialize(call, result)
             "initializeChat" -> initializeChat(call, result)
-            "setVisitorInfo" -1> setVisitorInfo(call, result)
+            "setVisitorInfo" -> setVisitorInfo(call, result)
             "startChat" -> startChat(result)
             else -> result.notImplemented()
         }
