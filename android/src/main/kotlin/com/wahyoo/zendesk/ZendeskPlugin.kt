@@ -69,7 +69,6 @@ public class ZendeskPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
     }
 
     override fun onAttachedToActivity(@NonNull binding: ActivityPluginBinding) {
-        println('asdfasdf' + binding)
         activityBinding = binding
     }
 
