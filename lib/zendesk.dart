@@ -47,6 +47,7 @@ class Zendesk {
     return await _channel.invokeMethod<bool>('initializeChat', args);
   }
 
+  /// Leave all fields blank when anonymous visitor is expected
   Future<bool> setVisitorInfo({
     String name,
     String email,

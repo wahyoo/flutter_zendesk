@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:zendesk/zendesk.dart';
+import 'package:zendesk_example/env.dart';
 
 void main() => runApp(MyApp());
 
@@ -25,8 +26,11 @@ class _MyAppState extends State<MyApp> {
             RaisedButton(
               onPressed: () async {
                 try {
-                  final bool initialized =
-                      await Zendesk.initialize('url', 'appId', 'clientId');
+                  final bool initialized = await Zendesk.initialize(
+                    Env.ZENDESK_URL,
+                    Env.ZENDESK_APP_ID,
+                    Env.ZENDESK_CLIENT_ID,
+                  );
 
                   print('initialize $initialized');
                 } catch (e) {
@@ -38,8 +42,33 @@ class _MyAppState extends State<MyApp> {
               child: const Text('initialize'),
             ),
             RaisedButton(
-              onPressed: () {},
+              onPressed: () async {
+                final bool status = await zendesk.initializeChat(
+                  Env.ZENDESK_ACCOUNT_KEY,
+                  department: 'Customer Wahyoo Mart Staging',
+                  appName: 'com.wahyoo_mobile.staging',
+                );
+
+                print(status);
+              },
               child: const Text('initializeChat'),
+            ),
+            RaisedButton(
+              onPressed: () async {
+                final bool status = await zendesk.setVisitorInfo(
+                  name: 'Visitor name',
+                  phoneNumber: '08222222222',
+                );
+
+                print(status);
+              },
+              child: const Text('setVisitorInfo'),
+            ),
+            RaisedButton(
+              onPressed: () {
+                zendesk.startChat();
+              },
+              child: const Text('startChat'),
             ),
           ],
         ),
