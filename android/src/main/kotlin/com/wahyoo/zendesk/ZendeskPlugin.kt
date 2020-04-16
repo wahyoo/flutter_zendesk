@@ -69,13 +69,13 @@ public class ZendeskPlugin(var context: Context? = null) : FlutterPlugin, Method
     }
 
     override fun onAttachedToActivity(@NonNull binding: ActivityPluginBinding) {
-        context = binding.activity
+        context = binding.activity.context
     }
 
     override fun onDetachedFromActivityForConfigChanges() {}
 
     override fun onReattachedToActivityForConfigChanges(@NonNull binding: ActivityPluginBinding) {
-        context = binding.activity
+        context = binding.activity.context
     }
 
     override fun onDetachedFromActivity() {}
