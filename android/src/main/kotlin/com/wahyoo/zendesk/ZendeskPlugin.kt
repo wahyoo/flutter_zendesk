@@ -32,12 +32,11 @@ import com.zopim.android.sdk.prechat.ZopimChatActivity
 
 /** ZendeskPlugin */
 /// should migrate to v2: https://developer.zendesk.com/embeddables/docs/chat-sdk-v-2-for-android/introduction
-public class ZendeskPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
-    private lateinit var activityBinding: ActivityPluginBinding
+public class ZendeskPlugin(var context: Context? = null) : FlutterPlugin, MethodCallHandler, ActivityAware {
 
     override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
         val channel = MethodChannel(flutterPluginBinding.getFlutterEngine().getDartExecutor(), "zendesk")
-        channel.setMethodCallHandler(ZendeskPlugin())
+        channel.setMethodCallHandler(ZendeskPlugin(flutterPluginBinding.applicationContext))
     }
 
     override fun onDetachedFromEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {}
@@ -55,7 +54,7 @@ public class ZendeskPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
         @JvmStatic
         fun registerWith(registrar: Registrar) {
             val channel = MethodChannel(registrar.messenger(), "zendesk")
-            channel.setMethodCallHandler(ZendeskPlugin())
+            channel.setMethodCallHandler(ZendeskPlugin(registrar.context()))
         }
     }
 
@@ -70,30 +69,32 @@ public class ZendeskPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
     }
 
     override fun onAttachedToActivity(@NonNull binding: ActivityPluginBinding) {
-        activityBinding = binding
+        context = binding.activity
     }
 
     override fun onDetachedFromActivityForConfigChanges() {}
 
     override fun onReattachedToActivityForConfigChanges(@NonNull binding: ActivityPluginBinding) {
-        activityBinding = binding
+        context = binding.activity
     }
 
     override fun onDetachedFromActivity() {}
 
     /// channels
     private fun initialize(call: MethodCall, result: Result) {
-        activityBinding?.activity?.let {
+        context?.let {
             val appId: String = call.argument("appId")!!
             val clientId: String = call.argument("clientId")!!
             val url: String = call.argument("url")!!
+            val name: String? = call?.argument("name")
+            val email: String? = call?.argument("email")
 
-            Zendesk.INSTANCE.init(activityBinding.activity, url, appId, clientId)
+            Zendesk.INSTANCE.init(it, url, appId, clientId)
             val identity = AnonymousIdentity()
             Zendesk.INSTANCE.setIdentity(identity)
             Support.INSTANCE.init(Zendesk.INSTANCE)
 
-            RequestListActivity.builder().show(activityBinding.activity.applicationContext)
+//            RequestListActivity.builder().show(it)
             result.success(true)
             return
         }
@@ -135,18 +136,19 @@ public class ZendeskPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             builder = builder.phoneNumber(phoneNumber)
         }
 
-        if (call.hasArgument("note")) {
-            val note: String = call.argument("note")!!
-            builder = builder.note(note)
-        }
         ZopimChat.setVisitorInfo(builder.build())
         result.success(true)
     }
 
     private fun startChat(result: Result) {
-        val intent = Intent(activityBinding.activity, ZopimChatActivity::class.java)
-        activityBinding.activity.startActivity(intent)
+        context?.let {
+            val intent = Intent(context, ZopimChatActivity::class.java)
+            it.startActivity(intent)
 
-        result.success(true)
+            result.success(true)
+            return
+        }
+
+        result.error("STARTING_CHAT_FAILED", "Failed to start chat", null)
     }
 }

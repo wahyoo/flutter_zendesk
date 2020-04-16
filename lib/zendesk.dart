@@ -51,19 +51,15 @@ class Zendesk {
   }
 
   /// Leave all fields blank when anonymous visitor is expected
-  ///
-  /// is iOS and Zendesk SDK [note] is not used
   Future<bool> setVisitorInfo({
     String name,
     String email,
     String phoneNumber,
-    String note,
   }) async {
     final Map<String, String> args = <String, String>{
       'name': name.emptyIfNull,
       'email': email.emptyIfNull,
       'phoneNumber': phoneNumber.emptyIfNull,
-      'note': note.emptyIfNull,
     };
 
     return await _channel.invokeMethod<bool>('setVisitorInfo', args);
