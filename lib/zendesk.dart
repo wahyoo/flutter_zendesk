@@ -24,7 +24,7 @@ class Zendesk {
     String appId,
     String clientId,
   ) async {
-    final Map<String, dynamic> args = <String, dynamic>{
+    final Map<String, String> args = <String, String>{
       'appId': appId,
       'clientId': clientId,
       'url': zendeskUrl,
@@ -48,6 +48,8 @@ class Zendesk {
   }
 
   /// Leave all fields blank when anonymous visitor is expected
+  ///
+  /// is iOS and Zendesk SDK [note] is not used
   Future<bool> setVisitorInfo({
     String name,
     String email,

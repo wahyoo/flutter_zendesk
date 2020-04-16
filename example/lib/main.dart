@@ -65,8 +65,10 @@ class _MyAppState extends State<MyApp> {
               child: const Text('setVisitorInfo'),
             ),
             RaisedButton(
-              onPressed: () {
-                zendesk.startChat();
+              onPressed: () async {
+                final bool started = await zendesk.startChat();
+
+                print(started);
               },
               child: const Text('startChat'),
             ),
