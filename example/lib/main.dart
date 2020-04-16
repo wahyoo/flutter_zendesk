@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:zendesk/zendesk.dart';
+import 'package:zendesk/zendesk_identity.dart';
 import 'package:zendesk_example/env.dart';
 
 void main() => runApp(MyApp());
@@ -50,6 +51,10 @@ class _HomePageState extends State<HomePage> {
                   Env.ZENDESK_URL,
                   Env.ZENDESK_APP_ID,
                   Env.ZENDESK_CLIENT_ID,
+                  identity: ZendeskIdentity(
+                    name: 'Identity Name',
+                    email: 'identity@email.com',
+                  ),
                 );
 
                 print('initialize $initialized');

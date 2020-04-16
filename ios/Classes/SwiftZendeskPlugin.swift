@@ -35,25 +35,31 @@ public class SwiftZendeskPlugin: NSObject, FlutterPlugin {
             return
         }
 
-        if let mapOfArgs = args as? [String: String],
-            let appId = mapOfArgs["appId"],
-            let clientId = mapOfArgs["clientId"],
-            let url = mapOfArgs["url"] {
+        if let mapOfArgs = args as? [String: Any],
+            let appId = mapOfArgs["appId"] as? String,
+            let clientId = mapOfArgs["clientId"] as? String,
+            let url = mapOfArgs["url"] as? String {
             
             Zendesk.initialize(appId: appId, clientId: clientId, zendeskUrl: url)
             
-            let identity = Identity.createAnonymous()
+            let name = mapOfArgs["name"] as? String
+            let email = mapOfArgs["email"] as? String
+            
+            let identity = Identity.createAnonymous(name: name, email: email)
             Zendesk.instance?.setIdentity(identity)
             Support.initialize(withZendesk: Zendesk.instance)
             
-            let viewController = RequestUi.buildRequestList(with: [])
+            result(true)
+            return
             
-            if let navigationController = UIApplication.shared.keyWindow?.rootViewController as? UINavigationController {
-                navigationController.present(viewController, animated: true, completion: nil)
+            // let viewController = RequestUi.buildRequestList(with: [])
+            
+            // if let navigationController = UIApplication.shared.keyWindow?.rootViewController as? UINavigationController {
+                // navigationController.present(viewController, animated: true, completion: nil)
                 
-                result(true)
-                return
-            }
+                // result(true)
+                // return
+            // }
         }
         
         result(error)

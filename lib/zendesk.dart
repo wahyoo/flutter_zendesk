@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
+import 'package:zendesk/zendesk_identity.dart';
 
 extension on String {
   String get emptyIfNull => this ?? '';
@@ -22,12 +22,15 @@ class Zendesk {
   static Future<bool> initialize(
     String zendeskUrl,
     String appId,
-    String clientId,
-  ) async {
+    String clientId, {
+    ZendeskIdentity identity,
+  }) async {
     final Map<String, String> args = <String, String>{
       'appId': appId,
       'clientId': clientId,
       'url': zendeskUrl,
+      'name': identity.name,
+      'email': identity.email,
     };
 
     return await _channel.invokeMethod<bool>('initialize', args);
