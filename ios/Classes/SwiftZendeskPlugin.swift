@@ -48,16 +48,15 @@ public class SwiftZendeskPlugin: NSObject, FlutterPlugin {
             
             let viewController = RequestUi.buildRequestList(with: [])
             
-            // https://github.com/flutter/flutter/issues/25078#issuecomment-448500575
             if let navigationController = UIApplication.shared.keyWindow?.rootViewController as? UINavigationController {
-                navigationController.pushViewController(viewController, animated: true)
+                navigationController.present(viewController, animated: true, completion: nil)
                 
                 result(true)
                 return
             }
-        } else {
-            result(error)
         }
+        
+        result(error)
     }
     
     public func initializeChat(_ call: FlutterMethodCall, _ result: FlutterResult) {
@@ -83,7 +82,6 @@ public class SwiftZendeskPlugin: NSObject, FlutterPlugin {
             }
             
             Chat.instance?.configuration = config
-            
             
             result(true)
             return
@@ -133,10 +131,8 @@ public class SwiftZendeskPlugin: NSObject, FlutterPlugin {
         let chatEngine = try! ChatEngine.engine()
         let viewController = try! Messaging.instance.buildUI(engines: [chatEngine], configs: [messagingConfiguration, chatConfiguration])
 
-        // Present view controller
-        // https://github.com/flutter/flutter/issues/25078#issuecomment-448500575
         if let navigationController = UIApplication.shared.keyWindow?.rootViewController as? UINavigationController {
-            navigationController.pushViewController(viewController, animated: true)
+            navigationController.present(viewController, animated: true, completion: nil)
             
             result(true)
             return
