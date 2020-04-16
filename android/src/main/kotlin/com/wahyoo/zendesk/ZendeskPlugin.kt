@@ -31,6 +31,7 @@ import com.zopim.android.sdk.model.VisitorInfo
 import com.zopim.android.sdk.prechat.ZopimChatActivity
 
 /** ZendeskPlugin */
+/// should migrate to v2: https://developer.zendesk.com/embeddables/docs/chat-sdk-v-2-for-android/introduction
 public class ZendeskPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
     private lateinit var activityBinding: ActivityPluginBinding
 

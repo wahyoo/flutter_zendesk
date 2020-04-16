@@ -117,11 +117,13 @@ public class SwiftZendeskPlugin: NSObject, FlutterPlugin {
             }
         }
         
-        result(false)
+        result(error)
         
     }
     
     public func startChat(_ result: FlutterResult) {
+        let error = FlutterError(code: "STARTING_CHAT_FAILED", message: "Failed to start chat", details: nil)
+        
         let messagingConfiguration = MessagingConfiguration()
         messagingConfiguration.name = "Wahyoo Chat"
 
@@ -140,6 +142,6 @@ public class SwiftZendeskPlugin: NSObject, FlutterPlugin {
             return
         }
         
-        result(false)
+        result(error)
     }
 }
