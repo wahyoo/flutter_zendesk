@@ -1,5 +1,6 @@
 package com.wahyoo.zendesk
 
+import android.content.Context
 import androidx.annotation.NonNull
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
@@ -9,29 +10,18 @@ import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
 import io.flutter.plugin.common.PluginRegistry.Registrar
-
-import java.util.ArrayList
-
-import android.content.Intent
-import android.content.Context
-import android.app.Activity
-import android.os.Bundle
-
-import zendesk.commonui.UiConfig
+import zendesk.chat.Chat
+import zendesk.chat.ChatEngine
+import zendesk.chat.VisitorInfo
 import zendesk.core.AnonymousIdentity
-import zendesk.core.Identity
 import zendesk.core.Zendesk
+import zendesk.messaging.MessagingActivity
 import zendesk.support.Support
-import zendesk.support.guide.HelpCenterActivity
-import zendesk.support.request.RequestActivity
 import zendesk.support.requestlist.RequestListActivity
-
-import com.zopim.android.sdk.api.ZopimChat
-import com.zopim.android.sdk.model.VisitorInfo
-import com.zopim.android.sdk.prechat.ZopimChatActivity
 
 /** ZendeskPlugin */
 /// should migrate to v2: https://developer.zendesk.com/embeddables/docs/chat-sdk-v-2-for-android/introduction
+@Suppress("unused", "RedundantVisibilityModifier")
 public class ZendeskPlugin(var context: Context? = null) : FlutterPlugin, MethodCallHandler, ActivityAware {
 
     override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
@@ -69,13 +59,13 @@ public class ZendeskPlugin(var context: Context? = null) : FlutterPlugin, Method
     }
 
     override fun onAttachedToActivity(@NonNull binding: ActivityPluginBinding) {
-        context = binding.activity.context
+        context = binding.activity.applicationContext
     }
 
     override fun onDetachedFromActivityForConfigChanges() {}
 
     override fun onReattachedToActivityForConfigChanges(@NonNull binding: ActivityPluginBinding) {
-        context = binding.activity.context
+        context = binding.activity.applicationContext
     }
 
     override fun onDetachedFromActivity() {}
@@ -86,15 +76,24 @@ public class ZendeskPlugin(var context: Context? = null) : FlutterPlugin, Method
             val appId: String = call.argument("appId")!!
             val clientId: String = call.argument("clientId")!!
             val url: String = call.argument("url")!!
-            val name: String? = call?.argument("name")
-            val email: String? = call?.argument("email")
 
             Zendesk.INSTANCE.init(it, url, appId, clientId)
-            val identity = AnonymousIdentity()
-            Zendesk.INSTANCE.setIdentity(identity)
+            val identity = AnonymousIdentity.Builder()
+
+            if (call.hasArgument("name")) {
+                val name: String = call.argument("name")!!
+                identity.withNameIdentifier(name)
+            }
+
+            if (call.hasArgument("email")) {
+                val email: String = call.argument("email")!!
+                identity.withEmailIdentifier(email)
+            }
+
+            Zendesk.INSTANCE.setIdentity(identity.build())
             Support.INSTANCE.init(Zendesk.INSTANCE)
 
-//            RequestListActivity.builder().show(it)
+            // RequestListActivity.builder().show(it)
             result.success(true)
             return
         }
@@ -102,51 +101,43 @@ public class ZendeskPlugin(var context: Context? = null) : FlutterPlugin, Method
         result.error("INITIALIZE_FAILED", "Failed to initialize", null)
     }
 
+    private fun buildIdentity(){}
+
     private fun initializeChat(call: MethodCall, result: Result) {
         val accountKey: String = call.argument("accountKey")!!
-        val zopimConfig = ZopimChat.init(accountKey)
+        Chat.INSTANCE.init(context!!, accountKey)
+
+        val chatProvider = Chat.INSTANCE.providers()?.chatProvider()
 
         if (call.hasArgument("department")) {
-            val department: String = call.argument("department")!!
-            zopimConfig.department(department)
-        }
-
-        if (call.hasArgument("appName")) {
-            val visitor: String = call.argument("appName")!!
-            zopimConfig.visitorPathOne(visitor)
+            chatProvider?.setDepartment(call.argument<String>("department")!!, null)
         }
 
         result.success(true)
     }
 
     private fun setVisitorInfo(call: MethodCall, result: Result) {
-        var builder = VisitorInfo.Builder()
-        if (call.hasArgument("name")) {
-            val name: String = call.argument("name")!!
-            builder = builder.name(name)
+        val profileProvider = Chat.INSTANCE.providers()?.profileProvider()
+
+        val visitorInfo = VisitorInfo.builder()
+                .withPhoneNumber(call.argument("name"))
+                .withEmail(call.argument("email"))
+                .withName(call.argument("phoneNumber"))
+                .build()
+
+        if (call.hasArgument("note")) {
+            profileProvider?.setVisitorNote(call.argument("note")!!, null)
         }
 
-        if (call.hasArgument("email")) {
-            val email: String = call.argument("email")!!
-            builder = builder.email(email)
-        }
-
-        if (call.hasArgument("phoneNumber")) {
-            val phoneNumber: String = call.argument("phoneNumber")!!
-            builder = builder.phoneNumber(phoneNumber)
-        }
-
-        ZopimChat.setVisitorInfo(builder.build())
+        profileProvider?.setVisitorInfo(visitorInfo, null)
         result.success(true)
     }
 
     private fun startChat(result: Result) {
         context?.let {
-            val intent = Intent(context, ZopimChatActivity::class.java)
-            it.startActivity(intent)
-
-            result.success(true)
-            return
+            MessagingActivity.builder()
+                    .withEngines(ChatEngine.engine())
+                    .show(it)
         }
 
         result.error("STARTING_CHAT_FAILED", "Failed to start chat", null)
