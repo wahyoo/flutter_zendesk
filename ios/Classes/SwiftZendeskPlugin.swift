@@ -26,10 +26,10 @@ public class SwiftZendeskPlugin: NSObject, FlutterPlugin {
         default: result(FlutterMethodNotImplemented)
         }
     }
-    
+
     public func initialize(_ call: FlutterMethodCall, _ result: FlutterResult) {
         let error = FlutterError(code: "INITIALIZE_FAILED", message: "Failed to initialize", details: nil)
-    
+
         guard let args = call.arguments else {
             result(error)
             return
@@ -39,95 +39,95 @@ public class SwiftZendeskPlugin: NSObject, FlutterPlugin {
             let appId = mapOfArgs["appId"] as? String,
             let clientId = mapOfArgs["clientId"] as? String,
             let url = mapOfArgs["url"] as? String {
-            
+
             Zendesk.initialize(appId: appId, clientId: clientId, zendeskUrl: url)
-            
+
             let name = mapOfArgs["name"] as? String
             let email = mapOfArgs["email"] as? String
-            
+
             let identity = Identity.createAnonymous(name: name, email: email)
             Zendesk.instance?.setIdentity(identity)
             Support.initialize(withZendesk: Zendesk.instance)
-            
+
             result(true)
             return
-            
+
             // let viewController = RequestUi.buildRequestList(with: [])
-            
+
             // if let navigationController = UIApplication.shared.keyWindow?.rootViewController as? UINavigationController {
                 // navigationController.present(viewController, animated: true, completion: nil)
-                
+
                 // result(true)
                 // return
             // }
         }
-        
+
         result(error)
     }
-    
+
     public func initializeChat(_ call: FlutterMethodCall, _ result: FlutterResult) {
         let error = FlutterError(code: "INITIALIZE_CHAT_FAILED", message: "Failed to initialize chat", details: nil)
-        
+
         guard let args = call.arguments else {
             result(error)
             return
         }
-        
+
         if let mapOfArgs = args as? [String: String],
             let accountKey = mapOfArgs["accountKey"] {
-            
+
             Chat.initialize(accountKey: accountKey, queue: .main)
             let config = ChatAPIConfiguration()
-            
+
             if let department = mapOfArgs["department"] {
                 config.department = department
             }
-            
+
             if let visitor = mapOfArgs["appName"] {
                 config.visitorPathOne = visitor
             }
-            
+
             Chat.instance?.configuration = config
-            
+
             result(true)
             return
-            
+
         } else {
             result(error)
         }
     }
-    
+
     public func setVisitorInfo(_ call: FlutterMethodCall, _ result: FlutterResult) {
         let error = FlutterError(code: "SET_VISITOR_INFO_FAILED", message: "Failed to set visitor information", details: nil)
-        
+
         guard let args = call.arguments else {
             result(error)
             return
         }
-        
+
         if let mapOfargs = args as? [String: String],
             let name = mapOfargs["name"],
             let email = mapOfargs["email"],
             let phoneNumber = mapOfargs["phoneNumber"] {
-            
+
             let visitorInfo = VisitorInfo(name: name, email: email, phoneNumber: phoneNumber)
-            
+
             if let config: ChatAPIConfiguration = Chat.instance?.configuration {
                 config.visitorInfo = visitorInfo
                 Chat.instance?.configuration = config
-                
+
                 result(true)
                 return
             }
         }
-        
+
         result(error)
-        
+
     }
-    
+
     public func startChat(_ result: FlutterResult) {
         let error = FlutterError(code: "STARTING_CHAT_FAILED", message: "Failed to start chat", details: nil)
-        
+
         let messagingConfiguration = MessagingConfiguration()
         messagingConfiguration.name = "Wahyoo Chat"
 
@@ -139,11 +139,11 @@ public class SwiftZendeskPlugin: NSObject, FlutterPlugin {
 
         if let navigationController = UIApplication.shared.keyWindow?.rootViewController as? UINavigationController {
             navigationController.present(viewController, animated: true, completion: nil)
-            
+
             result(true)
             return
         }
-        
+
         result(error)
     }
 }
