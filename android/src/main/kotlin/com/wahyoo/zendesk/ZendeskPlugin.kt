@@ -10,21 +10,12 @@ import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
 import io.flutter.plugin.common.PluginRegistry.Registrar
 
-import java.util.ArrayList
-
 import android.content.Intent
 import android.content.Context
-import android.app.Activity
-import android.os.Bundle
 
-import zendesk.commonui.UiConfig
 import zendesk.core.AnonymousIdentity
-import zendesk.core.Identity
 import zendesk.core.Zendesk
 import zendesk.support.Support
-import zendesk.support.guide.HelpCenterActivity
-import zendesk.support.request.RequestActivity
-import zendesk.support.requestlist.RequestListActivity
 
 import com.zopim.android.sdk.api.ZopimChat
 import com.zopim.android.sdk.model.VisitorInfo
