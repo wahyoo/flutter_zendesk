@@ -1,6 +1,5 @@
 package com.wahyoo.zendesk
 
-import android.content.Context
 import androidx.annotation.NonNull
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
@@ -10,14 +9,17 @@ import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
 import io.flutter.plugin.common.PluginRegistry.Registrar
-import zendesk.chat.Chat
-import zendesk.chat.ChatEngine
-import zendesk.chat.VisitorInfo
+
+import android.content.Intent
+import android.content.Context
+
 import zendesk.core.AnonymousIdentity
 import zendesk.core.Zendesk
-import zendesk.messaging.MessagingActivity
 import zendesk.support.Support
-import zendesk.support.requestlist.RequestListActivity
+
+import com.zopim.android.sdk.api.ZopimChat
+import com.zopim.android.sdk.model.VisitorInfo
+import com.zopim.android.sdk.prechat.ZopimChatActivity
 
 /** ZendeskPlugin */
 /// should migrate to v2: https://developer.zendesk.com/embeddables/docs/chat-sdk-v-2-for-android/introduction
@@ -93,7 +95,8 @@ public class ZendeskPlugin(var context: Context? = null) : FlutterPlugin, Method
             Zendesk.INSTANCE.setIdentity(identity.build())
             Support.INSTANCE.init(Zendesk.INSTANCE)
 
-            // RequestListActivity.builder().show(it)
+
+//            RequestListActivity.builder().show(it)
             result.success(true)
             return
         }
@@ -101,43 +104,51 @@ public class ZendeskPlugin(var context: Context? = null) : FlutterPlugin, Method
         result.error("INITIALIZE_FAILED", "Failed to initialize", null)
     }
 
-    private fun buildIdentity(){}
-
     private fun initializeChat(call: MethodCall, result: Result) {
         val accountKey: String = call.argument("accountKey")!!
-        Chat.INSTANCE.init(context!!, accountKey)
-
-        val chatProvider = Chat.INSTANCE.providers()?.chatProvider()
+        val zopimConfig = ZopimChat.init(accountKey)
 
         if (call.hasArgument("department")) {
-            chatProvider?.setDepartment(call.argument<String>("department")!!, null)
+            val department: String = call.argument("department")!!
+            zopimConfig.department(department)
+        }
+
+        if (call.hasArgument("appName")) {
+            val visitor: String = call.argument("appName")!!
+            zopimConfig.visitorPathOne(visitor)
         }
 
         result.success(true)
     }
 
     private fun setVisitorInfo(call: MethodCall, result: Result) {
-        val profileProvider = Chat.INSTANCE.providers()?.profileProvider()
-
-        val visitorInfo = VisitorInfo.builder()
-                .withPhoneNumber(call.argument("name"))
-                .withEmail(call.argument("email"))
-                .withName(call.argument("phoneNumber"))
-                .build()
-
-        if (call.hasArgument("note")) {
-            profileProvider?.setVisitorNote(call.argument("note")!!, null)
+        var builder = VisitorInfo.Builder()
+        if (call.hasArgument("name")) {
+            val name: String = call.argument("name")!!
+            builder = builder.name(name)
         }
 
-        profileProvider?.setVisitorInfo(visitorInfo, null)
+        if (call.hasArgument("email")) {
+            val email: String = call.argument("email")!!
+            builder = builder.email(email)
+        }
+
+        if (call.hasArgument("phoneNumber")) {
+            val phoneNumber: String = call.argument("phoneNumber")!!
+            builder = builder.phoneNumber(phoneNumber)
+        }
+
+        ZopimChat.setVisitorInfo(builder.build())
         result.success(true)
     }
 
     private fun startChat(result: Result) {
         context?.let {
-            MessagingActivity.builder()
-                    .withEngines(ChatEngine.engine())
-                    .show(it)
+            val intent = Intent(context, ZopimChatActivity::class.java)
+            it.startActivity(intent)
+
+            result.success(true)
+            return
         }
 
         result.error("STARTING_CHAT_FAILED", "Failed to start chat", null)
