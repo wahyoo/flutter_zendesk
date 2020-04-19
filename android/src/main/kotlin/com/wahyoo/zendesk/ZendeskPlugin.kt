@@ -32,6 +32,7 @@ import com.zopim.android.sdk.prechat.ZopimChatActivity
 
 /** ZendeskPlugin */
 /// should migrate to v2: https://developer.zendesk.com/embeddables/docs/chat-sdk-v-2-for-android/introduction
+@Suppress("unused", "RedundantVisibilityModifier")
 public class ZendeskPlugin(var context: Context? = null) : FlutterPlugin, MethodCallHandler, ActivityAware {
 
     override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
@@ -69,13 +70,13 @@ public class ZendeskPlugin(var context: Context? = null) : FlutterPlugin, Method
     }
 
     override fun onAttachedToActivity(@NonNull binding: ActivityPluginBinding) {
-        context = binding.activity.context
+        context = binding.activity.applicationContext
     }
 
     override fun onDetachedFromActivityForConfigChanges() {}
 
     override fun onReattachedToActivityForConfigChanges(@NonNull binding: ActivityPluginBinding) {
-        context = binding.activity.context
+        context = binding.activity.applicationContext
     }
 
     override fun onDetachedFromActivity() {}
@@ -86,13 +87,23 @@ public class ZendeskPlugin(var context: Context? = null) : FlutterPlugin, Method
             val appId: String = call.argument("appId")!!
             val clientId: String = call.argument("clientId")!!
             val url: String = call.argument("url")!!
-            val name: String? = call?.argument("name")
-            val email: String? = call?.argument("email")
 
             Zendesk.INSTANCE.init(it, url, appId, clientId)
-            val identity = AnonymousIdentity()
-            Zendesk.INSTANCE.setIdentity(identity)
+            val identity = AnonymousIdentity.Builder()
+
+            if (call.hasArgument("name")) {
+                val name: String = call.argument("name")!!
+                identity.withNameIdentifier(name)
+            }
+
+            if (call.hasArgument("email")) {
+                val email: String = call.argument("email")!!
+                identity.withEmailIdentifier(email)
+            }
+
+            Zendesk.INSTANCE.setIdentity(identity.build())
             Support.INSTANCE.init(Zendesk.INSTANCE)
+
 
 //            RequestListActivity.builder().show(it)
             result.success(true)

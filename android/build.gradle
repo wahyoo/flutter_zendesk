@@ -46,6 +46,9 @@ android {
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
+    // please comment this line below when building
+    implementation files('libs/flutter.jar')
+
     // see https://developer.zendesk.com/embeddables/docs/android-unified-sdk/getting_started
     implementation group: 'com.zopim.android', name: 'sdk', version: '1.4.2'
     implementation group: 'com.zendesk', name: 'support', version: '3.0.1'
