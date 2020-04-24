@@ -51,15 +51,6 @@ public class SwiftZendeskPlugin: NSObject, FlutterPlugin {
 
             result(true)
             return
-
-            // let viewController = RequestUi.buildRequestList(with: [])
-
-            // if let navigationController = UIApplication.shared.keyWindow?.rootViewController as? UINavigationController {
-                // navigationController.present(viewController, animated: true, completion: nil)
-
-                // result(true)
-                // return
-            // }
         }
 
         result(error)
