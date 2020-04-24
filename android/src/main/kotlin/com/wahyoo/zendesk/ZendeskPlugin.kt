@@ -145,6 +145,7 @@ public class ZendeskPlugin(var context: Context? = null) : FlutterPlugin, Method
     private fun startChat(result: Result) {
         context?.let {
             val intent = Intent(context, ZopimChatActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
             it.startActivity(intent)
 
             result.success(true)
