@@ -3,8 +3,8 @@
 # Run `pod lib lint zendesk.podspec' to validate before publishing.
 #
 Pod::Spec.new do |s|
-  s.name             = 'zendesk'
-  s.version          = '0.0.1'
+  s.name             = 'flutter_zendesk'
+  s.version          = '0.1.0'
   s.summary          = 'Zendesk plugin.'
   s.description      = <<-DESC
 Zendesk plugin.
