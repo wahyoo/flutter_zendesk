@@ -9,7 +9,7 @@ import SupportSDK
 import ChatSDK
 import MessagingSDK
 
-// documentation see:    https://developer.zendesk.com/embeddables/docs/ios-unified-sdk/getting_started
+// documentation see: https://developer.zendesk.com/embeddables/docs/ios-unified-sdk/getting_started
 public class SwiftZendeskPlugin: NSObject, FlutterPlugin {
     public static func register(with registrar: FlutterPluginRegistrar) {
         let channel = FlutterMethodChannel(name: "zendesk", binaryMessenger: registrar.messenger())
