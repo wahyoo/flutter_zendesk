@@ -1,6 +1,6 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:zendesk/zendesk.dart';
+import 'package:flutter_zendesk/zendesk.dart';
 
 void main() {
   const MethodChannel channel = MethodChannel('zendesk');

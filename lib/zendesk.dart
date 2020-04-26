@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/services.dart';
-import 'package:zendesk/zendesk_identity.dart';
+import 'package:flutter_zendesk/zendesk_identity.dart';
 
 extension on String {
   String get emptyIfNull => this ?? '';

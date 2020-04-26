@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:zendesk/zendesk.dart';
-import 'package:zendesk/zendesk_identity.dart';
+import 'package:flutter_zendesk/zendesk.dart';
+import 'package:flutter_zendesk/zendesk_identity.dart';
 import 'package:zendesk_example/env.dart';
 
 void main() => runApp(MyApp());
